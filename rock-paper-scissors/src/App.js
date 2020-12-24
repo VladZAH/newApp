@@ -1,76 +1,96 @@
-import React from 'react'; 
+import React, { Component } from 'react';
+import paperImage from './assets/paper.jpg';
+import rockImage from './assets/rock.jpg';
+import scissorsImage from './assets/scissors.jpg';
 import './App.css';
-import Display from "./components/Display";
-import Game from "./components/Game";
+import PlayerChoice from './PlayerChoice';
 
-class App extends React.Component {
-  constructor(props){
+const CHOICES = ['paper', 'scissors', 'rock'];
+
+function generateComputerChoice() {
+  const randomNum = Math.random() * 3;
+  const roundedNum = Math.floor(randomNum); //  0, 1 or 2
+  return CHOICES[roundedNum];
+}
+
+class App extends Component {
+  constructor(props) {
     super(props);
 
     this.state = {
-      you: 0,
-      computer: 0,
-      cmpChoice: null,
-      yourChoice: null,
-      border: "4px solid green"
+      playerScore: 0,
+      computerScore: 0
+    };
+    this.handleClick = this.handleClick.bind(this);
+    this.handleClickOption = this.handleClickOption.bind(this);
+  }
+
+  componentDidUpdate() {
+    if (this.state.playerScore === 5) {
+      alert('Player wins!');
+    } else if (this.state.computerScore === 5) {
+      alert('Computer wins!');
     }
   }
 
-  
-  reset = () => {
-    this.setState({you: 0, computer: 0, yourChoice: null, cmpChoice: null});
+  handleClick() {
+    // this.state.playerScore = this.state.playerScore+ 1; WRONG, never assign directly to state
+    this.setState({
+      playerScore: 0,
+      computerScore: 0
+    });
   }
 
-  winner = () => {
-    if(this.state.computer === 5){
-      alert("Computer won! 🤖 ")
-      this.reset();
-    }else if(this.state.you === 5){
-      alert("Congratulations, you won! 🤠 ")
-      this.reset();
+  handleClickOption(playerChoice) {
+    const computerChoice =  generateComputerChoice();
+    if (playerChoice === computerChoice) return;
+
+    if (
+      (playerChoice === 'paper' && computerChoice === 'rock') ||
+      (playerChoice === 'rock' && computerChoice === 'scissors') ||
+      (playerChoice === 'scissors' && computerChoice === 'paper')
+    ) {
+      // Player wins the round
+      this.setState({ playerScore: this.state.playerScore + 1 });
+    } else {
+      // Computer wins the round
+      this.setState({ computerScore: this.state.computerScore + 1 });
     }
   }
 
-  pickRandom = (pick) => {
-      let chs = ['rock', 'paper', 'scissors'];
-      let random = chs[Math.floor(Math.random() * 3)];  
-      if((pick === "rock" && random === "paper") || (pick === "paper" && random === "scissors") || (pick === "scissors" && random === "rock")){
-        this.setState({cmpChoice: random, yourChoice: pick, computer: this.state.computer + 1});
-      }else if((pick === "paper" && random === "rock") || (pick === "scissors" && random === "paper") || (pick === "rock" && random === "scissors")){
-        this.setState({cmpChoice: random, yourChoice: pick, you: this.state.you + 1});
-      }else{
-        this.setState({cmpChoice: random, yourChoice: pick});
-      }
-  }
-  
-  componentDidUpdate(){
-    setTimeout(() => {
-      if(this.state.you === 5 || this.state.computer === 5){
-        this.winner();
-      }
-    }, 1)
-  }
-
-  render(){
+  render() {
     return (
       <div className="App">
-        <header className="App-header">
+        <div>
+          <h1>Scoreboard</h1>
           <div>
-            <a onClick={() => {this.pickRandom("rock")}}><Display img="rock" /></a>
-            <a onClick={() => {this.pickRandom("paper")}}><Display img="paper" /></a>
-            <a onClick={() => {this.pickRandom("scissors")}}><Display img="scissors" /></a>
-          </div>
-          <div style={{display: 'flex', justifyContent: "center"}}>
-            <p style={{width: '50%'}}>PLAYER<br/>{this.state.you}<br/></p>
-            <p style={{width: '50%'}}>COMPUTER<br/>{this.state.computer}<br/></p>
+            Player Score: {this.state.playerScore}
           </div>
           <div>
-          <Game cimage={this.state.cmpChoice ? this.state.cmpChoice : null} yourimage={this.state.yourChoice}/>
-          <button style={{height: '50px', width: '200px', backgroundColor: 'gainsboro', fontSize: '30px'}} onClick={this.reset}>RESET</button>
+            Computer Score: {this.state.computerScore}
           </div>
-        </header>
+        </div>
+        <div>
+          <button onClick={this.handleClick}>Reset</button>
+        </div>
+  
+        <PlayerChoice
+          name="paper"
+          image={paperImage}
+          onClick={this.handleClickOption}
+        />
+        <PlayerChoice
+          name="rock"
+          image={rockImage}
+          onClick={this.handleClickOption}
+        />
+        <PlayerChoice
+          name="scissors"
+          image={scissorsImage}
+          onClick={this.handleClickOption}
+        />
       </div>
-    );    
+    );
   }
 }
 
