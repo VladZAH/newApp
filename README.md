@@ -1,2 +1,2 @@
-Applications I started long time ago and did not finish, or small applications.
+Applications I started long time ago and did not finish.
 To be deployed...
